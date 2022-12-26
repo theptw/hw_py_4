@@ -87,7 +87,7 @@ def form_dict(list1, list2):
         
 print(form_dict(var1,var2))
 
-# data = open('sum.txt', 'a')
+
 
 def final_str_original_only(dict1,dict2):
     key_difference1 = dict1.keys() - dict2.keys()
@@ -137,8 +137,14 @@ elif len(dict2) < len(dict1):
 print(dict1)
 print(dict2)
 
-    # for key in dict1:
-    #     final.append(key)
+for i in range(len(dict1)):
+    final.append(str(int(dict1[f'{len(dict1) - i}']) + int(dict2[f'{len(dict1) - i}'])) + '*x**' + f'{len(dict1) - i}')
 
-# data.close()
+print(final)
 
+data = open('sum.txt', 'w')
+for i in range(len(final)):
+    if i != len(final) - 1:
+        data.write(final[i] + ' + ')
+    else: data.write(final[i] + ' = 0')
+data.close()
