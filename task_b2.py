@@ -48,9 +48,9 @@ def form_dict(list1, list2):
                 x = i
                 if list1[b][-1] == 'x':
                     power = '1'
-            if list1[b][i] != 'x' and i < x: # Остальные случаи: если i меньше x добавляем цифру в коэфицент
+            if i < x: # Остальные случаи: если i не дошел до x добавляем цифру в коэфицент
                 koef += list1[b][i]
-            elif list1[b][i] != 'x' and i > x and len(list1[b]) > 2: # если больше - в степень
+            elif i > x and len(list1[b]) > 2: # если больше - в степень
                 power += list1[b][i]
         dict1[power] = koef
 
@@ -72,17 +72,17 @@ def form_dict(list1, list2):
                 x = i
                 if list2[b][-1] == 'x':
                     power = '1'
-            if list2[b][i] != 'x' and i < x:
+            if i < x:
                 koef += list2[b][i]
-            elif list2[b][i] != 'x' and i > x and len(list2[b]) > 2:
+            elif i > x and len(list2[b]) > 2:
                 power += list2[b][i]
         dict2[power] = koef
     return dict1, dict2
         
-print(form_dict(var1,var2))
+print(f'Получившиеся словари: {form_dict(var1,var2)}')
 
 def final_str_original_only(dict1,dict2):
-    key_difference1 = dict1.keys() - dict2.keys()
+    key_difference1 = dict1.keys() - dict2.keys() # вычисляем кол-во уникальных элементов(степеней - ключей) и в каком словаре они находятся
     key_difference2 = dict2.keys() - dict1.keys()
     if len(key_difference1) == 0:
         uni_keys = []
@@ -94,9 +94,20 @@ def final_str_original_only(dict1,dict2):
             uni_values.append(dict2[uni_keys[i]])
 
         uni_final = []
-        for i in range(len(uni_values)):
-            uni_final.append(uni_values[i] + '*x**' + uni_keys[i])
+        for i in range(len(uni_keys)): # перевод в int для сортировки
+            uni_keys[i] = int(uni_keys[i])
+            uni_values[i] = int(uni_values[i])
+        
+        for run in range(len(uni_keys) - 1): # сортировка
+            for i in range(len(uni_keys) - 1):
+                if uni_keys[i] < uni_keys[i+1]:
+                    uni_keys[i], uni_keys[i+1] = uni_keys[i+1], uni_keys[i]
+                    uni_values[i], uni_values[i+1] = uni_values[i+1], uni_values[i]  
+
+        for i in range(len(uni_values)): # формирование финального массива строк уникальных степеней(которые есть только в одном списке)
+            uni_final.append(str(uni_values[i]) + '*x**' + str(uni_keys[i]))
         return uni_final
+
     elif len(key_difference2) == 0:
         uni_keys = []
         for key in key_difference1:
@@ -108,8 +119,6 @@ def final_str_original_only(dict1,dict2):
 
         uni_final = []
         temp = 0
-        print(uni_keys)
-        print(uni_values)
         for i in range(len(uni_keys)): # перевод в int для сортировки
             uni_keys[i] = int(uni_keys[i])
             uni_values[i] = int(uni_values[i])
@@ -120,36 +129,27 @@ def final_str_original_only(dict1,dict2):
                     uni_keys[i], uni_keys[i+1] = uni_keys[i+1], uni_keys[i]
                     uni_values[i], uni_values[i+1] = uni_values[i+1], uni_values[i]
 
-        for i in range(len(uni_values)): # формирование финального массива строк уникальных степеней(которые есть только в одном списке)
+        for i in range(len(uni_values)): 
             uni_final.append(str(uni_values[i]) + '*x**' + str(uni_keys[i]))
         return uni_final
 
 final = final_str_original_only(dict1, dict2)
-print(final)
+print(f'Уникальные степени: {final}')
 
 
 if len(dict2) > len(dict1):
-    difference = len(dict2) - len(dict1)
-    for i in range(len(dict2), len(dict1), -1):
+    for i in range(len(dict2), len(dict1), -1): # Удаление уникальных элементов из словарей
         dict2.pop(f'{i}')
 elif len(dict2) < len(dict1):
-    difference = len(dict1) - len(dict2)
     for i in range(len(dict1), len(dict2), -1):
         dict1.pop(f'{i}')
-for i in range(len(dict1)):
-    final.append(str(int(dict1[f'{len(dict1) - i}']) + int(dict2[f'{len(dict1) - i}'])) + '*x**' + f'{len(dict1) - i}')
+for i in range(len(dict1)): # Сложение оставшихся степеней и добавление в список
+    if i != len(dict1) - 1:
+        final.append(str(int(dict1[f'{len(dict1) - i}']) + int(dict2[f'{len(dict1) - i}'])) + '*x**' + f'{len(dict1) - i}')
+    else:
+        final.append(str(int(dict1[f'{len(dict1) - i}']) + int(dict2[f'{len(dict1) - i}'])) + '*x')
         
-print(final)
-# maxx = 0
-# temp = 0
-# for i in range(len(final)):
-#     for b in range(len(final[i])):
-#         if final[i][b] == 'x':
-#             x = b
-#         if len(final[i][x:]) == 4 and int(final[i][-2:]) > maxx:
-#             maxx = final[i]
-
-
+print(f'Итоговый список: {final}')
 
 data = open('sum.txt', 'w')
 for i in range(len(final)):
